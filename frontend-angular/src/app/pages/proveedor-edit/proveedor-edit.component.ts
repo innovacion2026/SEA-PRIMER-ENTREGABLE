@@ -7,7 +7,16 @@ import { ApiService } from '../../services/api.service';
 
 interface Contacto { id: number; rol: string; nombre: string; identificacion: string; cargo: string; telefono: string; email: string }
 interface HistEntry { id: number; fecha: string; usuario: string; comentario: string }
-interface DocEntry { name: string; obligatorio: boolean; cargado: boolean; validado: boolean; fechaCarga?: string; fechaVenc?: string }
+interface DocEntry {
+  name: string;
+  obligatorio: boolean;
+  cargado: boolean;
+  validado: boolean;
+  archivo?: string;
+  fechaCarga?: string;
+  fechaVenc?: string;
+  origen?: 'Portal Proveedores' | 'Carga Interna';
+}
 
 @Component({
   selector: 'app-proveedor-edit',
@@ -152,60 +161,91 @@ interface DocEntry { name: string; obligatorio: boolean; cargado: boolean; valid
         </div>
 
         <!-- Tab: Documentos -->
-        <div *ngSwitchCase="'documentos'" class="card-elevated p-6 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-4">
-          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 border-b pb-4">
-            <div>
-              <h2 class="text-lg font-bold text-primary">Relación de Documentos</h2>
-              <p class="text-xs text-muted-foreground">Estado de carga y validación. <span class="text-destructive font-bold">*</span> indica obligatorio.</p>
-            </div>
-            <div class="min-w-[220px]">
-              <div class="flex items-center justify-between text-xs mb-1">
-                <span class="font-bold">Completado</span>
-                <span class="font-bold">{{ pctDocs }}%</span>
+        <div *ngSwitchCase="'documentos'" class="space-y-6">
+          
+          <!-- Sync Banner with Portal Proveedores -->
+          <div class="p-4 rounded-2xl bg-indigo-50 border-2 border-indigo-200 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <div class="h-10 w-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-md">
+                <lucide-icon name="file-text" class="h-5 w-5"></lucide-icon>
               </div>
-              <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                <div class="h-full bg-primary rounded-full transition-all duration-500" [style.width.%]="pctDocs"></div>
+              <div>
+                <div class="text-sm font-bold text-indigo-950">Expediente Sincronizado con Portal de Proveedores (SEA-PROVEEDORES)</div>
+                <div class="text-xs text-indigo-700 mt-0.5">Los archivos PDF subidos por el proveedor se reciben automáticamente para su revisión y validación administrativa.</div>
               </div>
             </div>
+            <button (click)="cargarDocumentosPortal()" class="h-9 px-3 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-sm shrink-0">
+              <lucide-icon name="search" class="h-3.5 w-3.5"></lucide-icon> Sincronizar Bóveda
+            </button>
           </div>
 
-          <div class="overflow-x-auto border-2 border-slate-100 rounded-xl">
-            <table class="w-full text-sm">
-              <thead class="bg-primary/[0.02] border-b-2 border-slate-200">
-                <tr>
-                  <th class="p-3 text-left text-xs uppercase font-bold text-slate-700">Documento</th>
-                  <th class="p-3 text-left text-xs uppercase font-bold text-slate-700">Cargado</th>
-                  <th class="p-3 text-left text-xs uppercase font-bold text-slate-700">Validado</th>
-                  <th class="p-3 text-left text-xs uppercase font-bold text-slate-700">Vencimiento</th>
-                  <th class="p-3 text-center text-xs font-bold text-slate-700 w-28"></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let d of documentos; let idx = index" class="border-b border-slate-100 last:border-0 hover:bg-slate-50/50">
-                  <td class="p-3 font-semibold text-slate-700">
-                    {{ d.name }} <span class="text-destructive font-bold" *ngIf="d.obligatorio">*</span>
-                  </td>
-                  <td class="p-3">
-                    <span [class]="'px-2 py-0.5 rounded-full text-[10px] font-bold border ' + (d.cargado ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-500 border-slate-200')">
-                      {{ d.cargado ? 'Sí' : 'No' }}
-                    </span>
-                  </td>
-                  <td class="p-3">
-                    <span [class]="'px-2 py-0.5 rounded-full text-[10px] font-bold border ' + (d.validado ? 'bg-primary/10 text-primary border-primary/20' : 'bg-amber-50 text-amber-700 border-amber-200')">
-                      {{ d.validado ? 'Validado' : 'Pendiente' }}
-                    </span>
-                  </td>
-                  <td class="p-3 tabular-nums text-slate-600 font-semibold">{{ d.fechaVenc || '—' }}</td>
-                  <td class="p-3 text-center">
-                    <div class="flex justify-end gap-1">
-                      <button (click)="toggleCargado(idx)" class="h-8 w-8 text-primary hover:bg-primary/10 rounded-lg flex items-center justify-center">
-                        <lucide-icon name="plus" class="h-4 w-4"></lucide-icon>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <!-- Main Document Table -->
+          <div class="card-elevated p-6 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-4">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 border-b pb-4">
+              <div>
+                <h2 class="text-lg font-bold text-primary">Relación de Documentos y Recaudos Adjuntos</h2>
+                <p class="text-xs text-muted-foreground">Revise el archivo PDF cargado por el proveedor y proceda a su validación. <span class="text-destructive font-bold">*</span> indica obligatorio.</p>
+              </div>
+              <div class="min-w-[220px]">
+                <div class="flex items-center justify-between text-xs mb-1">
+                  <span class="font-bold">Completado</span>
+                  <span class="font-bold">{{ pctDocs }}%</span>
+                </div>
+                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                  <div class="h-full bg-primary rounded-full transition-all duration-500" [style.width.%]="pctDocs"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto border-2 border-slate-100 rounded-xl">
+              <table class="w-full text-sm">
+                <thead class="bg-primary/[0.02] border-b-2 border-slate-200">
+                  <tr>
+                    <th class="p-3 text-left text-xs uppercase font-bold text-slate-700">Documento / Tipo</th>
+                    <th class="p-3 text-left text-xs uppercase font-bold text-slate-700">Archivo PDF Adjunto</th>
+                    <th class="p-3 text-left text-xs uppercase font-bold text-slate-700">Origen Carga</th>
+                    <th class="p-3 text-center text-xs uppercase font-bold text-slate-700">Validado</th>
+                    <th class="p-3 text-left text-xs uppercase font-bold text-slate-700">Vencimiento</th>
+                    <th class="p-3 text-center text-xs font-bold text-slate-700 w-36">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let d of documentos; let idx = index" class="border-b border-slate-100 last:border-0 hover:bg-slate-50/50">
+                    <td class="p-3 font-semibold text-slate-800">
+                      <div>{{ d.name }} <span class="text-destructive font-bold" *ngIf="d.obligatorio">*</span></div>
+                    </td>
+                    <td class="p-3 font-mono text-xs">
+                      <div *ngIf="d.cargado && d.archivo" class="flex items-center gap-1.5 text-primary font-bold">
+                        <lucide-icon name="file-text" class="h-4 w-4 text-primary shrink-0"></lucide-icon>
+                        <span class="underline cursor-pointer" (click)="verPdfModal(d)">{{ d.archivo }}</span>
+                      </div>
+                      <span *ngIf="!d.cargado" class="text-slate-400 font-sans italic">Sin archivo subido</span>
+                    </td>
+                    <td class="p-3 text-xs">
+                      <span [class]="'px-2 py-0.5 rounded-full text-[10px] font-extrabold border ' + (d.origen === 'Portal Proveedores' ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : 'bg-slate-100 text-slate-600 border-slate-200')">
+                        {{ d.origen || 'Portal Proveedores' }}
+                      </span>
+                    </td>
+                    <td class="p-3 text-center">
+                      <span [class]="'px-2 py-0.5 rounded-full text-[10px] font-bold border ' + (d.validado ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200')">
+                        {{ d.validado ? 'Validado' : 'Pendiente' }}
+                      </span>
+                    </td>
+                    <td class="p-3 tabular-nums text-slate-600 font-semibold text-xs">{{ d.fechaVenc || '—' }}</td>
+                    <td class="p-3 text-center">
+                      <div class="flex items-center justify-center gap-1.5">
+                        <button *ngIf="d.cargado" (click)="verPdfModal(d)" class="h-8 px-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1">
+                          <lucide-icon name="eye" class="h-3.5 w-3.5 text-primary"></lucide-icon> Ver
+                        </button>
+                        <button (click)="toggleValidado(idx)" [class]="'h-8 px-2.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-all ' + (d.validado ? 'bg-emerald-100 text-emerald-800' : 'bg-primary text-white hover:bg-primary/90')">
+                          <lucide-icon name="check-circle" class="h-3.5 w-3.5"></lucide-icon> {{ d.validado ? 'Aprobado' : 'Validar' }}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
@@ -257,6 +297,61 @@ interface DocEntry { name: string; obligatorio: boolean; cargado: boolean; valid
 
       </div>
 
+      <!-- Viewer Modal for Attached PDF Document -->
+      <div *ngIf="selectedDocModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+        <div class="w-full max-w-xl bg-white border-2 border-primary rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+          <div class="p-5 bg-slate-900 text-white flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="h-10 w-10 rounded-xl bg-primary flex items-center justify-center">
+                <lucide-icon name="file-text" class="h-5 w-5 text-white"></lucide-icon>
+              </div>
+              <div>
+                <h3 class="text-base font-bold">{{ selectedDocModal.name }}</h3>
+                <p class="text-xs text-slate-300 font-mono">{{ selectedDocModal.archivo }}</p>
+              </div>
+            </div>
+            <button (click)="selectedDocModal = null" class="h-8 w-8 text-slate-400 hover:text-white flex items-center justify-center">
+              <lucide-icon name="x" class="h-5 w-5"></lucide-icon>
+            </button>
+          </div>
+
+          <div class="p-6 space-y-4">
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2">
+              <div class="flex justify-between">
+                <span class="font-bold text-slate-500">Origen de Carga:</span>
+                <span class="font-bold text-indigo-700 font-mono">{{ selectedDocModal.origen || 'Portal Proveedores (SEA-PROVEEDORES)' }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="font-bold text-slate-500">Fecha de Recepción:</span>
+                <span class="font-mono">{{ selectedDocModal.fechaCarga || '2026-08-01' }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="font-bold text-slate-500">Estado Validación:</span>
+                <span [class]="'font-bold ' + (selectedDocModal.validado ? 'text-emerald-600' : 'text-amber-600')">
+                  {{ selectedDocModal.validado ? 'VALIDADO Y APROBADO' : 'PENDIENTE DE VALIDACIÓN' }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Fake PDF Preview Box -->
+            <div class="h-44 rounded-xl bg-slate-900 border border-slate-700 flex flex-col items-center justify-center text-white text-center p-4">
+              <lucide-icon name="file-text" class="h-12 w-12 text-primary mb-2"></lucide-icon>
+              <div class="font-bold text-sm">{{ selectedDocModal.archivo }}</div>
+              <div class="text-xs text-slate-400 mt-1">Vista previa del documento legal oficial</div>
+            </div>
+          </div>
+
+          <div class="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
+            <button (click)="selectedDocModal = null" class="h-10 px-4 border border-slate-300 font-bold text-xs rounded-xl hover:bg-slate-200">
+              Cerrar
+            </button>
+            <button (click)="aprobarModalDoc()" class="h-10 px-5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-md">
+              <lucide-icon name="check-circle" class="h-4 w-4"></lucide-icon> Marcar Documento como Validado
+            </button>
+          </div>
+        </div>
+      </div>
+
     </div>
   `
 })
@@ -265,6 +360,7 @@ export class ProveedorEditComponent implements OnInit {
   isSolicitud = false;
   activeTab = 'generales';
   data: any = null;
+  selectedDocModal: DocEntry | null = null;
 
   actividades = ["Arrendamiento y Afines", "Gestión Humana", "Infraestructura", "Hoteles y Viajes", "Mantenimiento Integral", "Tecnología", "Seguridad", "Servicios Básicos", "Transporte"];
   estatusOptions = ["En revisión", "Activo", "Inactivo", "Suspendido"];
@@ -293,30 +389,21 @@ export class ProveedorEditComponent implements OnInit {
   }
 
   initDocumentos() {
-    const docs = [
-      "Documento Constitutivo y Modificaciones Estatutarias",
-      "Publicación de Gaceta Mercantil",
-      "Productos y Servicios que Presta",
-      "Designación de Junta Directiva",
-      "Patente de Industria y Comercio",
-      "Balance General",
-      "RIF",
-      "Declaración de I.S.L.R.",
-      "Cédula del Representante Legal",
-      "Referencia Bancaria",
-      "Referencia Comercial",
-      "Licencia de Actividades Económicas",
-      "Estado de Resultados Último Ejercicio",
-      "Carta de Inicio de Actividad Comercial",
+    this.documentos = [
+      { name: "Documento Constitutivo y Modificaciones Estatutarias", obligatorio: true, cargado: true, validado: true, archivo: "REGISTRO_MERCANTIL_ANDINA.pdf", fechaCarga: "2026-01-15", fechaVenc: "2026-12-31", origen: "Portal Proveedores" },
+      { name: "Publicación de Gaceta Mercantil", obligatorio: true, cargado: true, validado: false, archivo: "GACETA_MERCANTIL_ANDINA.pdf", fechaCarga: "2026-02-10", fechaVenc: "2026-12-31", origen: "Portal Proveedores" },
+      { name: "Productos y Servicios que Presta", obligatorio: false, cargado: true, validado: false, archivo: "CATALOGO_SERVICIOS.pdf", fechaCarga: "2026-03-01", fechaVenc: "2026-12-31", origen: "Portal Proveedores" },
+      { name: "Designación de Junta Directiva", obligatorio: true, cargado: false, validado: true, fechaVenc: undefined, origen: "Portal Proveedores" },
+      { name: "Patente de Industria y Comercio", obligatorio: true, cargado: true, validado: false, archivo: "PATENTE_CARACAS_2026.pdf", fechaCarga: "2026-04-05", fechaVenc: "2026-12-31", origen: "Portal Proveedores" },
+      { name: "Balance General", obligatorio: false, cargado: true, validado: false, archivo: "BALANCE_GENERAL_AUDITADO.pdf", fechaCarga: "2026-05-12", fechaVenc: "2026-12-31", origen: "Portal Proveedores" },
+      { name: "RIF", obligatorio: true, cargado: true, validado: true, archivo: "RIF_ANDINA_2026.pdf", fechaCarga: "2026-01-15", fechaVenc: "2026-12-31", origen: "Portal Proveedores" },
+      { name: "Solvencia Laboral Vigente", obligatorio: true, cargado: true, validado: false, archivo: "SOLVENCIA_LABORAL_2026.pdf", fechaCarga: "2026-08-01", fechaVenc: "2026-12-31", origen: "Portal Proveedores" },
+      { name: "Certificación Bancaria Oficial", obligatorio: true, cargado: true, validado: true, archivo: "CERTIFICACION_MERCANTIL.pdf", fechaCarga: "2026-01-15", fechaVenc: "2026-07-15", origen: "Portal Proveedores" }
     ];
+  }
 
-    this.documentos = docs.map((d, k) => ({
-      name: d,
-      obligatorio: k % 3 !== 2,
-      cargado: k % 4 !== 3,
-      validado: k % 3 === 0,
-      fechaVenc: k % 4 !== 3 ? "2026-12-31" : undefined
-    }));
+  cargarDocumentosPortal() {
+    alert("¡Bóveda de Documentos sincronizada en tiempo real con SEA-PROVEEDORES!");
   }
 
   loadProveedor() {
@@ -364,8 +451,20 @@ export class ProveedorEditComponent implements OnInit {
     this.contactos.splice(idx, 1);
   }
 
-  toggleCargado(idx: number) {
-    this.documentos[idx].cargado = !this.documentos[idx].cargado;
+  toggleValidado(idx: number) {
+    this.documentos[idx].validado = !this.documentos[idx].validado;
+  }
+
+  verPdfModal(doc: DocEntry) {
+    this.selectedDocModal = doc;
+  }
+
+  aprobarModalDoc() {
+    if (this.selectedDocModal) {
+      this.selectedDocModal.validado = true;
+      this.selectedDocModal = null;
+      alert("¡Documento validado y aprobado exitosamente!");
+    }
   }
 
   addHistorial() {

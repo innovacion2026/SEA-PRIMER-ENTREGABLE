@@ -51,6 +51,26 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/pago-edit/pago-edit.component').then(m => m.PagoEditComponent)
       },
       {
+        path: 'presupuesto/configuracion',
+        loadComponent: () => import('./pages/presupuesto/presupuesto-configuracion.component').then(m => m.PresupuestoConfiguracionComponent)
+      },
+      {
+        path: 'presupuesto/formulacion',
+        loadComponent: () => import('./pages/presupuesto/presupuesto-formulacion.component').then(m => m.PresupuestoFormulacionComponent)
+      },
+      {
+        path: 'presupuesto/trazabilidad',
+        loadComponent: () => import('./pages/presupuesto/presupuesto-trazabilidad.component').then(m => m.PresupuestoTrazabilidadComponent)
+      },
+      {
+        path: 'presupuesto/modificaciones',
+        loadComponent: () => import('./pages/presupuesto/presupuesto-modificaciones.component').then(m => m.PresupuestoModificacionesComponent)
+      },
+      {
+        path: 'presupuesto/reportes',
+        loadComponent: () => import('./pages/presupuesto/presupuesto-reportes.component').then(m => m.PresupuestoReportesComponent)
+      },
+      {
         path: '**',
         loadComponent: () => import('./pages/module-page/module-page.component').then(m => m.ModulePageComponent)
       }

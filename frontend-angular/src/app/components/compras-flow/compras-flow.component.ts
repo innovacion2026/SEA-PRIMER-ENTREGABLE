@@ -100,7 +100,7 @@ export class ComprasFlowComponent {
   stages = [
     {
       key: "Solicitud",
-      label: "Solicitud (Área)",
+      label: "Solicitud (Disponibilidad)",
       icon: "edit",
       border: "border-slate-400",
       bg: "bg-slate-50",
@@ -120,18 +120,8 @@ export class ComprasFlowComponent {
     },
     {
       key: "Compras",
-      label: "Compras (Selección)",
-      icon: "search",
-      border: "border-sky-500",
-      bg: "bg-sky-50",
-      chip: "bg-sky-500 text-white border-sky-500",
-      badge: "border-sky-500 text-sky-700 bg-white",
-      bar: "bg-sky-500",
-    },
-    {
-      key: "Presupuesto",
-      label: "Presupuesto (Imputación)",
-      icon: "calculator",
+      label: "Licitación / Selección (Cuadro)",
+      icon: "scale",
       border: "border-amber-500",
       bg: "bg-amber-50",
       chip: "bg-amber-500 text-white border-amber-500",

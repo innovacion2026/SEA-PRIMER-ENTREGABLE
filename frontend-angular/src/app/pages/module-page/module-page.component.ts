@@ -16,6 +16,7 @@ import { RendicionDialogComponent } from '../../components/rendicion-dialog/rend
 import { NuevoComiteDialogComponent } from '../../components/nuevo-comite-dialog/nuevo-comite-dialog.component';
 import { DetalleDialogComponent } from '../../components/detalle-dialog/detalle-dialog.component';
 import { EditGenericoDialogComponent } from '../../components/edit-generico-dialog/edit-generico-dialog.component';
+import { RevisionExpedienteDialogComponent } from '../../components/revision-expediente-dialog/revision-expediente-dialog.component';
 
 // Services & Config
 import { ApiService } from '../../services/api.service';
@@ -61,7 +62,7 @@ const pathMap: Record<string, string> = {
     ComprasFlowComponent, ViaticosFlowComponent, SolicitudesFlowComponent,
     NuevaSolicitudDialogComponent, NuevaSolicitudGenericaDialogComponent,
     RendicionDialogComponent, NuevoComiteDialogComponent,
-    DetalleDialogComponent, EditGenericoDialogComponent
+    DetalleDialogComponent, EditGenericoDialogComponent, RevisionExpedienteDialogComponent
   ],
   template: `
     <div class="space-y-6">
@@ -102,6 +103,13 @@ const pathMap: Record<string, string> = {
         [(open)]="openNew"
         (create)="handleCreate($event)"
       ></app-nueva-solicitud-dialog>
+
+      <app-revision-expediente-dialog
+        *ngIf="isSolicitudes"
+        [(open)]="openRevisionExpediente"
+        [row]="selectedExpedienteRow"
+        (approved)="handleApprovedExpediente($event)"
+      ></app-revision-expediente-dialog>
 
       <app-nueva-solicitud-generica-dialog
         *ngIf="isRequerimientos || isViaticos"
@@ -472,14 +480,28 @@ export class ModulePageComponent implements OnInit, OnDestroy {
     this.openRendicion = true;
   }
 
+  openRevisionExpediente = false;
+  selectedExpedienteRow: any = null;
+
   consultRow(row: any) {
     this.selectedRow = row;
     const id = row.id || 0;
-    if (this.pathname === "/app/compras/presupuestos") {
+    if (this.isSolicitudes) {
+      this.selectedExpedienteRow = row;
+      this.openRevisionExpediente = true;
+    } else if (this.pathname === "/app/compras/presupuestos") {
       this.router.navigate([`/app/compras/presupuestos/detalle/${id}`]);
     } else {
       this.openDetail = true;
     }
+  }
+
+  handleApprovedExpediente(row: any) {
+    if (row) {
+      row.etapa = "Aprobado";
+      row.estatus = "Aprobado";
+    }
+    this.loadData();
   }
 
   editRow(row: any) {

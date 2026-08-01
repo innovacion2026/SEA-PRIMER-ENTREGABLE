@@ -74,6 +74,14 @@ export class ApiService {
     return this.http.post<any>(`${this.apiBase}/solicitudes-proveedor`, data);
   }
 
+  invitarProveedor(data: any): Observable<any> {
+    return this.http.post<any>(`${this.apiBase}/portal/invitar-proveedor`, data);
+  }
+
+  aprobarExpedienteProveedor(data: any): Observable<any> {
+    return this.http.post<any>(`${this.apiBase}/portal/aprobar-expediente`, data);
+  }
+
   updateModuleData(module: string, id: number, data: any): Observable<any> {
     return this.http.put<any>(`${this.apiBase}/data/${module}/${id}`, data);
   }

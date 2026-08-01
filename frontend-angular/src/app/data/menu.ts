@@ -31,9 +31,19 @@ export const menu: MenuNode[] = [
   {
     title: "Compras", path: "/app/compras", icon: "shopping-cart",
     children: [
-      { title: "Presupuestos", path: "/app/compras/presupuestos", icon: "calculator", description: "Licitación / cotización y cuadro comparativo ponderado." },
+      { title: "Licitación / Selección", path: "/app/compras/presupuestos", icon: "scale", description: "Licitación / cotización y cuadro comparativo de proveedores." },
       { title: "Órdenes de Compra", path: "/app/compras/ordenes", icon: "file-signature" },
       { title: "Recepciones de Almacén", path: "/app/compras/recepciones", icon: "package-check", description: "Registro de lo entregado vs lo pedido." },
+    ],
+  },
+  {
+    title: "Gestión Presupuestaria", path: "/app/presupuesto", icon: "pie-chart",
+    children: [
+      { title: "Configuración", path: "/app/presupuesto/configuracion", icon: "settings-2", description: "Límites estrictos, ejercicio fiscal, maestro de partidas, centros de costo y bloqueos." },
+      { title: "Formulación Anual", path: "/app/presupuesto/formulacion", icon: "file-spreadsheet", description: "Formulación y carga del presupuesto anual." },
+      { title: "Trazabilidad y Fondos", path: "/app/presupuesto/trazabilidad", icon: "git-commit", description: "Reserva de fondos: Pre-comprometido, Comprometido, Causado y Pagado." },
+      { title: "Modificaciones Presupuestarias", path: "/app/presupuesto/modificaciones", icon: "arrow-left-right", description: "Traspasos, créditos adicionales y reducciones presupuestarias." },
+      { title: "Consultas y Reportes", path: "/app/presupuesto/reportes", icon: "bar-chart-3", description: "Ejecución presupuestaria, desviaciones y drill-down documental." },
     ],
   },
   {

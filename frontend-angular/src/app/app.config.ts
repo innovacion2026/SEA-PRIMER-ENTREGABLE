@@ -12,7 +12,8 @@ import {
   ListChecks, ScrollText, Shield, KeyRound, ShieldCheck, ChevronDown, ChevronRight, 
   LogOut, Menu, CalendarDays, Edit, Trash2, Plus, Search, X, Eye, Check, 
   AlertTriangle, Info, FileUp, Download, ArrowLeft, CheckCircle, AlertCircle,
-  ClipboardList, Package, CreditCard, CircleDollarSign, User, Lock
+  ClipboardList, Package, CreditCard, CircleDollarSign, User, Lock,
+  PieChart, FileSpreadsheet, GitCommit, Scale, ZoomIn, ListTree, CalendarCheck, ShieldAlert
 } from 'lucide-angular';
 
 const icons = {
@@ -23,7 +24,8 @@ const icons = {
   ListChecks, ScrollText, Shield, KeyRound, ShieldCheck, ChevronDown, ChevronRight, 
   LogOut, Menu, CalendarDays, Edit, Trash2, Plus, Search, X, Eye, Check, 
   AlertTriangle, Info, FileUp, Download, ArrowLeft, CheckCircle, AlertCircle,
-  ClipboardList, Package, CreditCard, CircleDollarSign, User, Lock
+  ClipboardList, Package, CreditCard, CircleDollarSign, User, Lock,
+  PieChart, FileSpreadsheet, GitCommit, Scale, ZoomIn, ListTree, CalendarCheck, ShieldAlert
 };
 
 export const appConfig: ApplicationConfig = {
