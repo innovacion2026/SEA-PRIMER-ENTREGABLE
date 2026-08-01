@@ -1,0 +1,13 @@
+server:
+  port: 3001
+
+spring:
+  datasource:
+    url: jdbc:oracle:thin:@localhost:1521/XEPDB1  # PDB (Pluggable Database) de Oracle 21c XE
+    username: system
+    password: Oracle1234
+    driver-class-name: oracle.jdbc.OracleDriver
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB

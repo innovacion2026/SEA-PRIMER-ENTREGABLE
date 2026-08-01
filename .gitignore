@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Angular build output & cache
+.angular/
+dist/
+
+# Java build output
+**/target/
+*.class
+
+# IDE & Editor files
+.idea/
+.vscode/
+*.iml
+.classpath
+.project
+.settings/
+
+# OS files
+.DS_Store
+Thumbs.db
