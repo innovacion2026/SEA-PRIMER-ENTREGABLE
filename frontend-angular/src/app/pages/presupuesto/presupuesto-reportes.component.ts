@@ -174,7 +174,7 @@ export class PresupuestoReportesComponent {
       pct: 72.4,
       drilldown: {
         solicitud: "SOL-2026-4182",
-        solicitante: "Isaac Lovera (Director IT)",
+        solicitante: "José Fernández (Director IT)",
         ordenCompra: "OC-2026-0891",
         proveedor: "Distribuidora Andina C.A.",
         factura: "FACT-00921",

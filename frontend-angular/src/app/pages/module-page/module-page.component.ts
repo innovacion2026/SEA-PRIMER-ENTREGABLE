@@ -24,32 +24,40 @@ import { datasets, fmtMoney, fmtDate, DataSet } from '../../data/mock';
 import { flatten } from '../../data/menu';
 
 const pathMap: Record<string, string> = {
+  "/app/proveedores": "proveedores",
   "/app/proveedores/directorio": "proveedores",
   "/app/proveedores/solicitudes": "solicitudes",
   "/app/proveedores/evaluacion": "evaluacion",
   "/app/proveedores/notificaciones": "notificaciones",
   "/app/proveedores/documentacion": "documentacion",
+  "/app/comite": "comite_lista",
   "/app/comite/lista": "comite_lista",
   "/app/comite/miembros": "comite_miembros",
   "/app/comite/casos": "comite_casos",
+  "/app/compras": "requerimientos",
   "/app/compras/requerimientos": "requerimientos",
   "/app/compras/presupuestos": "presupuestos",
   "/app/compras/ordenes": "ordenes",
   "/app/compras/recepciones": "recepciones",
+  "/app/tesoreria": "cxp",
   "/app/tesoreria/cxp": "cxp",
   "/app/tesoreria/retenciones": "retenciones",
   "/app/tesoreria/pagos": "pagos",
+  "/app/tesoreria/caja-chica": "caja_movimientos",
   "/app/tesoreria/caja-chica/parametros": "caja_parametros",
   "/app/tesoreria/caja-chica/movimientos": "caja_movimientos",
   "/app/tesoreria/caja-chica/soportes": "caja_soportes",
+  "/app/tesoreria/viaticos": "viaticos_solicitud",
   "/app/tesoreria/viaticos/parametros": "viaticos_parametros",
   "/app/tesoreria/viaticos/solicitud": "viaticos_solicitud",
   "/app/tesoreria/viaticos/movimientos": "viaticos_movimientos",
   "/app/tesoreria/viaticos/soportes": "viaticos_soportes",
+  "/app/configuracion": "compania",
   "/app/configuracion/compania": "compania",
   "/app/configuracion/parametros": "parametros_base",
   "/app/configuracion/lista-valores": "lista_valores",
   "/app/auditoria": "auditoria",
+  "/app/seguridad": "usuarios",
   "/app/seguridad/usuarios": "usuarios",
   "/app/seguridad/roles": "roles",
 };
@@ -83,7 +91,7 @@ const pathMap: Record<string, string> = {
             <lucide-icon name="file-up" class="h-4 w-4"></lucide-icon> Cargar
           </button>
           <button
-            *ngIf="isSolicitudes || isRequerimientos || isViaticos || isComites"
+            *ngIf="isSolicitudes || isRequerimientos || isViaticos || isComites || isCajaChica"
             (click)="handleNewClick()"
             class="h-11 rounded-xl bg-primary hover:bg-primary/95 text-white font-bold gap-2 shadow-lg shadow-primary/20 transition-all active:scale-95 px-6 flex items-center justify-center"
           >
@@ -92,10 +100,33 @@ const pathMap: Record<string, string> = {
         </div>
       </div>
 
-      <!-- Flow Visualizers -->
+      <!-- Flow & Summary Visualizers -->
       <app-solicitudes-flow *ngIf="isSolicitudes" [rows]="rows"></app-solicitudes-flow>
       <app-compras-flow *ngIf="isRequerimientos" [rows]="rows"></app-compras-flow>
       <app-viaticos-flow *ngIf="isViaticos" [rows]="rows"></app-viaticos-flow>
+
+      <div *ngIf="isCajaChica" class="grid grid-cols-1 sm:grid-cols-4 gap-4 animate-fade-in">
+        <div class="p-4 bg-white border-2 border-primary/20 rounded-2xl shadow-sm">
+          <div class="text-[10px] uppercase font-bold text-muted-foreground">Fondo Fijo de Caja Chica</div>
+          <div class="text-2xl font-black text-primary">$2,500.00</div>
+          <div class="text-xs text-emerald-600 font-bold mt-1">✓ Fondo Aprobado 2026</div>
+        </div>
+        <div class="p-4 bg-white border-2 border-emerald-200 rounded-2xl shadow-sm">
+          <div class="text-[10px] uppercase font-bold text-emerald-600">Saldo Disponible</div>
+          <div class="text-2xl font-black text-emerald-700">$1,520.00</div>
+          <div class="text-xs text-slate-500 font-medium mt-1">60.8% Restante</div>
+        </div>
+        <div class="p-4 bg-white border-2 border-amber-200 rounded-2xl shadow-sm">
+          <div class="text-[10px] uppercase font-bold text-amber-600">Monto Máx. / Boleta</div>
+          <div class="text-2xl font-black text-amber-700">$300.00</div>
+          <div class="text-xs text-amber-600 font-bold mt-1">Límite por Recibo</div>
+        </div>
+        <div class="p-4 bg-white border-2 border-slate-200 rounded-2xl shadow-sm">
+          <div class="text-[10px] uppercase font-bold text-slate-400">Custodio Responsable</div>
+          <div class="text-lg font-black text-slate-800">A. Linares</div>
+          <div class="text-xs text-slate-500 font-medium mt-1">Administración Central</div>
+        </div>
+      </div>
 
       <!-- Dialogs -->
       <app-nueva-solicitud-dialog
@@ -112,7 +143,7 @@ const pathMap: Record<string, string> = {
       ></app-revision-expediente-dialog>
 
       <app-nueva-solicitud-generica-dialog
-        *ngIf="isRequerimientos || isViaticos"
+        *ngIf="isRequerimientos || isViaticos || isCajaChica"
         [(open)]="openNew"
         [type]="isRequerimientos ? 'compra' : 'viatico'"
         (create)="handleCreate($event)"
@@ -332,7 +363,20 @@ export class ModulePageComponent implements OnInit, OnDestroy {
     this.title = meta?.title || 'Módulo';
     this.description = meta?.description || '';
     
-    const ds = datasets[this.pathname];
+    let targetPath = this.pathname;
+    if (!datasets[targetPath]) {
+      if (targetPath === "/app/tesoreria/viaticos") targetPath = "/app/tesoreria/viaticos/solicitud";
+      if (targetPath === "/app/tesoreria/caja-chica") targetPath = "/app/tesoreria/caja-chica/movimientos";
+      if (targetPath === "/app/proveedores") targetPath = "/app/proveedores/directorio";
+      if (targetPath === "/app/comite") targetPath = "/app/comite/lista";
+      if (targetPath === "/app/compras") targetPath = "/app/compras/requerimientos";
+      if (targetPath === "/app/tesoreria") targetPath = "/app/tesoreria/cxp";
+      if (targetPath === "/app/configuracion") targetPath = "/app/configuracion/compania";
+      if (targetPath === "/app/seguridad") targetPath = "/app/seguridad/usuarios";
+      if (targetPath === "/app/reportes") targetPath = "/app/reportes/gastos";
+    }
+
+    const ds = datasets[targetPath];
     this.columns = ds?.columns || [];
   }
 
@@ -347,7 +391,7 @@ export class ModulePageComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.apiService.fetchModuleData(key).subscribe({
       next: (res) => {
-        this.rows = res || [];
+        this.rows = (res && res.length > 0) ? res : (datasets[this.pathname]?.rows || []);
         this.loading = false;
       },
       error: () => {
@@ -375,7 +419,11 @@ export class ModulePageComponent implements OnInit, OnDestroy {
   }
 
   get isViaticos(): boolean {
-    return this.pathname === "/app/tesoreria/viaticos/solicitud";
+    return this.pathname.startsWith("/app/tesoreria/viaticos");
+  }
+
+  get isCajaChica(): boolean {
+    return this.pathname.startsWith("/app/tesoreria/caja-chica");
   }
 
   get isDirectorio(): boolean {
@@ -412,13 +460,29 @@ export class ModulePageComponent implements OnInit, OnDestroy {
 
   handleCreate(newRow: any) {
     if (this.isRequerimientos) {
-      this.apiService.createRequerimiento(newRow).subscribe(() => this.loadData());
+      this.apiService.createRequerimiento(newRow).subscribe({ next: () => this.loadData(), error: () => this.loadData() });
     } else if (this.isViaticos) {
-      this.apiService.createViatico({ ...newRow, codigo: `VIA-2026-${Math.floor(Math.random() * 1000)}` }).subscribe(() => this.loadData());
+      const payload = {
+        solicitante: newRow.solicitante || "J. Fernández",
+        destino: newRow.destino || "Caracas",
+        motivo: newRow.motivo || "Asignación de viaje",
+        monto_asignado: newRow.monto || 650,
+        estatus: newRow.estatus || "Pendiente"
+      };
+      this.apiService.createViatico(payload).subscribe({ next: () => this.loadData(), error: () => this.loadData() });
+    } else if (this.isCajaChica) {
+      const key = pathMap[this.pathname] || "caja_movimientos";
+      const payload = {
+        concepto: newRow.motivo || newRow.descripcion || "Reposición Fondo Caja Chica",
+        monto: newRow.monto || 180,
+        tipo: "Reposición",
+        estatus: "Aprobado"
+      };
+      this.apiService.updateModuleData(key, 0, payload).subscribe({ next: () => this.loadData(), error: () => this.loadData() });
     } else if (this.isSolicitudes) {
-      this.apiService.createSolicitudProveedor(newRow).subscribe(() => this.loadData());
+      this.apiService.createSolicitudProveedor(newRow).subscribe({ next: () => this.loadData(), error: () => this.loadData() });
     } else if (this.isComites) {
-      this.apiService.createComite(newRow).subscribe(() => this.loadData());
+      this.apiService.createComite(newRow).subscribe({ next: () => this.loadData(), error: () => this.loadData() });
     }
   }
 
@@ -446,11 +510,25 @@ export class ModulePageComponent implements OnInit, OnDestroy {
       }
     } else if (this.isViaticos) {
       const stages = ["Solicitud", "Aprobación", "Presupuesto", "Pago", "Rendición"];
-      const current = row.etapa || "Solicitud";
-      const nextIdx = stages.indexOf(current) + 1;
-      if (nextIdx < stages.length) {
-        this.apiService.updateEtapaViatico(row.id, stages[nextIdx]).subscribe(() => this.loadData());
+      const current = row.etapa || row.estatus || "Solicitud";
+      let currentIdx = stages.findIndex(st => current.toLowerCase().includes(st.toLowerCase()));
+      if (currentIdx === -1) {
+        if (current.toLowerCase().includes("pendiente")) currentIdx = 0;
+        else if (current.toLowerCase().includes("aprob") || current.toLowerCase().includes("revis")) currentIdx = 1;
+        else if (current.toLowerCase().includes("pagado")) currentIdx = 4;
+        else currentIdx = 0;
       }
+      const nextIdx = (currentIdx + 1) % stages.length;
+      const nextStage = stages[nextIdx];
+
+      row.etapa = nextStage;
+      row.estatus = nextStage;
+      this.rows = [...this.rows];
+
+      this.apiService.updateEtapaViatico(row.id, nextStage).subscribe({
+        next: () => this.loadData(),
+        error: () => this.loadData()
+      });
     }
   }
 

@@ -152,20 +152,7 @@ public class TesoreriaController {
     @PostMapping("/tesoreria/viaticos")
     public ResponseEntity<?> createViatico(@RequestBody Map<String, Object> body) {
         try {
-            String codigo = (String) body.get("codigo");
-            String solicitante = (String) body.get("solicitante");
-            String destino = (String) body.get("destino");
-            Object ida = body.get("ida");
-            Object regreso = body.get("regreso");
-            Double monto = body.get("monto") != null ? ((Number) body.get("monto")).doubleValue() : 0.0;
-            String estatus = (String) body.getOrDefault("estatus", "Pendiente");
-            String etapa = (String) body.getOrDefault("etapa", "Solicitud");
-            String motivo = (String) body.get("motivo");
-
-            String sql = "INSERT INTO viaticos (codigo, solicitante, destino, ida, regreso, monto, estatus, etapa, motivo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            jdbcTemplate.update(sql, codigo, solicitante, destino, ida != null ? Date.valueOf((String) ida) : null, regreso != null ? Date.valueOf((String) regreso) : null, monto, estatus, etapa, motivo);
-
-            Map<String, Object> created = genericDataService.keysToLowerCase(jdbcTemplate.queryForMap("SELECT * FROM viaticos WHERE codigo = ?", codigo));
+            Map<String, Object> created = genericDataService.updateModuleData("viaticos_solicitud", 0L, body);
             return ResponseEntity.status(201).body(created);
         } catch (Exception e) {
             e.printStackTrace();
@@ -177,7 +164,7 @@ public class TesoreriaController {
     public ResponseEntity<?> updateEtapaViatico(@PathVariable Long id, @RequestBody Map<String, Object> body) {
         try {
             String etapa = (String) body.get("etapa");
-            jdbcTemplate.update("UPDATE viaticos SET etapa = ? WHERE id = ?", etapa, id);
+            jdbcTemplate.update("UPDATE viaticos SET estatus = ? WHERE id = ?", etapa, id);
 
             Map<String, Object> updated = genericDataService.getRowById("VIATICOS", id);
             return ResponseEntity.ok(updated);
@@ -219,7 +206,7 @@ public class TesoreriaController {
             jdbcTemplate.update(insertSql, id, pFecha, categoria, descripcion, monto, facturaNro, fileName, fileType, fileBytes);
 
             // Fetch newly added gasto (id, fecha, categoria, monto)
-            String fetchSql = "SELECT * FROM (SELECT id, fecha, categoria, monto FROM rendicion_gastos WHERE viatico_id = ? ORDER BY id DESC) WHERE ROWNUM = 1";
+            String fetchSql = "SELECT id, fecha, categoria, monto FROM rendicion_gastos WHERE viatico_id = ? ORDER BY id DESC LIMIT 1";
             Map<String, Object> created = genericDataService.keysToLowerCase(jdbcTemplate.queryForMap(fetchSql, id));
             return ResponseEntity.status(201).body(created);
         } catch (Exception e) {

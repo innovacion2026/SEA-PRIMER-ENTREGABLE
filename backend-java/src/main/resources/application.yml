@@ -3,10 +3,10 @@ server:
 
 spring:
   datasource:
-    url: jdbc:oracle:thin:@localhost:1521/XEPDB1  # PDB (Pluggable Database) de Oracle 21c XE
-    username: system
-    password: Oracle1234
-    driver-class-name: oracle.jdbc.OracleDriver
+    url: jdbc:postgresql://localhost:5432/sea_db
+    username: postgres
+    password: 123456798
+    driver-class-name: org.postgresql.Driver
   servlet:
     multipart:
       max-file-size: 10MB

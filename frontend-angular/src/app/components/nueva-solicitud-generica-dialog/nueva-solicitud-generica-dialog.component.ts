@@ -185,7 +185,7 @@ export class NuevaSolicitudGenericaDialogComponent {
     const newRow = this.type === 'compra' ? {
       codigo: code,
       tipo_orden: "Producto",
-      solicitante: "Isaac Lovera",
+      solicitante: "José Fernández",
       departamento: "Administración",
       descripcion: this.descripcion || "Suministro de Equipamiento IT",
       cantidad_unidad: this.cantidad || "1 unidad",
@@ -198,7 +198,7 @@ export class NuevaSolicitudGenericaDialogComponent {
       etapa_negocio: "Solicitud"
     } : {
       codigo: code,
-      solicitante: "Isaac Lovera",
+      solicitante: "José Fernández",
       destino: this.destino,
       ida: today,
       regreso: today,

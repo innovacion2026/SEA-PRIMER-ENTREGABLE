@@ -26,11 +26,17 @@ import { LucideAngularModule } from 'lucide-angular';
           <div *ngFor="let col of editableKeys" class="space-y-1.5">
             <label class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ col.label }}</label>
             
-            <ng-container *ngIf="col.key === 'estatus'; else standardInput">
-              <select [(ngModel)]="data[col.key]" class="w-full h-11 px-3 rounded-lg border-2 border-primary/45 focus:outline-none focus:border-primary bg-white">
+            <ng-container *ngIf="col.key === 'estatus' || col.key === 'etapa' || col.key === 'tipo'; else standardInput">
+              <select [(ngModel)]="data[col.key]" class="w-full h-11 px-3 rounded-lg border-2 border-primary/45 focus:outline-none focus:border-primary bg-white font-medium">
                 <option value="Activo">Activo</option>
                 <option value="Inactivo">Inactivo</option>
                 <option value="Pendiente">Pendiente</option>
+                <option value="Aprobado">Aprobado</option>
+                <option value="En revisión">En revisión</option>
+                <option value="Pagado">Pagado</option>
+                <option value="Rendición">Rendición</option>
+                <option value="Reposición">Reposición</option>
+                <option value="Apertura">Apertura</option>
               </select>
             </ng-container>
             

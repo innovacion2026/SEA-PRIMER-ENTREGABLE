@@ -140,9 +140,28 @@ export class ViaticosFlowComponent {
   ];
 
   private updateCounts() {
-    this.counts = this.stages.map(s => ({
-      ...s,
-      items: this._rows.filter(r => (r.etapa || 'Solicitud') === s.key)
-    }));
+    this.counts = this.stages.map(s => {
+      const items = this._rows.filter(r => {
+        const stageVal = (r.etapa || r.estatus || 'Solicitud').toLowerCase();
+        const keyVal = s.key.toLowerCase();
+        if (keyVal === "solicitud") {
+          return stageVal.includes("solicitud") || stageVal.includes("pendiente") || stageVal.includes("borrador");
+        }
+        if (keyVal === "aprobación") {
+          return stageVal.includes("aprobac") || stageVal.includes("aprobado") || stageVal.includes("revis");
+        }
+        if (keyVal === "presupuesto") {
+          return stageVal.includes("presupuesto");
+        }
+        if (keyVal === "pago") {
+          return stageVal.includes("pago") || stageVal.includes("anticipo");
+        }
+        if (keyVal === "rendición") {
+          return stageVal.includes("rendic") || stageVal.includes("pagado") || stageVal.includes("completado");
+        }
+        return stageVal.includes(keyVal);
+      });
+      return { ...s, items };
+    });
   }
 }

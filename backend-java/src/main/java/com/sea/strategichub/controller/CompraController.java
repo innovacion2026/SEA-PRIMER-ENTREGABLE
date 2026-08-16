@@ -188,7 +188,7 @@ public class CompraController {
             jdbcTemplate.update(updateOcSql, id, id, id);
 
             // Fetch the newly added item
-            String fetchItemSql = "SELECT * FROM (SELECT * FROM ordenes_compra_items WHERE oc_id = ? ORDER BY id DESC) WHERE ROWNUM = 1";
+            String fetchItemSql = "SELECT * FROM ordenes_compra_items WHERE oc_id = ? ORDER BY id DESC LIMIT 1";
             Map<String, Object> created = genericDataService.keysToLowerCase(jdbcTemplate.queryForMap(fetchItemSql, id));
             return ResponseEntity.status(201).body(created);
         } catch (Exception e) {
@@ -293,7 +293,7 @@ public class CompraController {
             updateRecepcionEstado(id);
 
             // Fetch newly added item
-            String fetchItemSql = "SELECT * FROM (SELECT * FROM recepciones_almacen_items WHERE recepcion_id = ? ORDER BY id DESC) WHERE ROWNUM = 1";
+            String fetchItemSql = "SELECT * FROM recepciones_almacen_items WHERE recepcion_id = ? ORDER BY id DESC LIMIT 1";
             Map<String, Object> created = genericDataService.keysToLowerCase(jdbcTemplate.queryForMap(fetchItemSql, id));
             return ResponseEntity.status(201).body(created);
         } catch (Exception e) {
