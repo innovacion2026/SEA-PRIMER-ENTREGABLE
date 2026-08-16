@@ -307,8 +307,14 @@ const pathMap: Record<string, string> = {
         <div class="flex items-center justify-between px-6 py-4 bg-slate-50/50 border-t border-slate-200 text-xs font-bold text-slate-400 uppercase tracking-widest">
           <span>Mostrando {{ getFiltered().length }} de {{ rows.length }} registros</span>
           <div class="flex items-center gap-2">
-            <div class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-            Sistema en línea
+            <div *ngIf="isLiveDb" class="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-300 flex items-center gap-1.5 font-bold text-[11px] uppercase tracking-wider">
+              <div class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
+              Base de Datos En Línea (Oracle)
+            </div>
+            <div *ngIf="!isLiveDb" class="px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-300 flex items-center gap-1.5 font-bold text-[11px] uppercase tracking-wider">
+              <div class="h-2 w-2 rounded-full bg-amber-500"></div>
+              Modo Demostración (Mock Offline)
+            </div>
           </div>
         </div>
 
@@ -380,23 +386,33 @@ export class ModulePageComponent implements OnInit, OnDestroy {
     this.columns = ds?.columns || [];
   }
 
+  isLiveDb = false;
+
   loadData() {
     const key = pathMap[this.pathname];
     if (!key) {
       const ds = datasets[this.pathname];
       this.rows = ds?.rows || [];
+      this.isLiveDb = false;
       return;
     }
 
     this.loading = true;
     this.apiService.fetchModuleData(key).subscribe({
       next: (res) => {
-        this.rows = (res && res.length > 0) ? res : (datasets[this.pathname]?.rows || []);
+        if (res && res.length > 0) {
+          this.rows = res;
+          this.isLiveDb = true;
+        } else {
+          this.rows = datasets[this.pathname]?.rows || [];
+          this.isLiveDb = false;
+        }
         this.loading = false;
       },
       error: () => {
         const ds = datasets[this.pathname];
         this.rows = ds?.rows || [];
+        this.isLiveDb = false;
         this.loading = false;
       }
     });
