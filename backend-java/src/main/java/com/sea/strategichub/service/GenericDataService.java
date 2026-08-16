@@ -138,7 +138,7 @@ public class GenericDataService {
             sql.append(") VALUES (").append(placeholders).append(")");
             jdbcTemplate.update(sql.toString(), values.toArray());
             
-            List<Map<String, Object>> latest = jdbcTemplate.queryForList("SELECT * FROM " + tableName + " ORDER BY id DESC LIMIT 1");
+            List<Map<String, Object>> latest = jdbcTemplate.queryForList("SELECT * FROM " + tableName + " ORDER BY id DESC FETCH FIRST 1 ROWS ONLY");
             return latest.isEmpty() ? cleanBody : keysToLowerCase(latest.get(0));
         } else {
             List<String> fields = new ArrayList<>();

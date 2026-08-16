@@ -3,10 +3,10 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/sea_db
-    username: postgres
+    url: jdbc:oracle:thin:@localhost:1521/XEPDB1
+    username: system
     password: 123456798
-    driver-class-name: org.postgresql.Driver
+    driver-class-name: oracle.jdbc.OracleDriver
   servlet:
     multipart:
       max-file-size: 10MB

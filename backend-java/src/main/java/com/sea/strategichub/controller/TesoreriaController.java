@@ -206,7 +206,7 @@ public class TesoreriaController {
             jdbcTemplate.update(insertSql, id, pFecha, categoria, descripcion, monto, facturaNro, fileName, fileType, fileBytes);
 
             // Fetch newly added gasto (id, fecha, categoria, monto)
-            String fetchSql = "SELECT id, fecha, categoria, monto FROM rendicion_gastos WHERE viatico_id = ? ORDER BY id DESC LIMIT 1";
+            String fetchSql = "SELECT id, fecha, categoria, monto FROM rendicion_gastos WHERE viatico_id = ? ORDER BY id DESC FETCH FIRST 1 ROWS ONLY";
             Map<String, Object> created = genericDataService.keysToLowerCase(jdbcTemplate.queryForMap(fetchSql, id));
             return ResponseEntity.status(201).body(created);
         } catch (Exception e) {

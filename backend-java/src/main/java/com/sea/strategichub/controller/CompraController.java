@@ -293,7 +293,7 @@ public class CompraController {
             updateRecepcionEstado(id);
 
             // Fetch newly added item
-            String fetchItemSql = "SELECT * FROM recepciones_almacen_items WHERE recepcion_id = ? ORDER BY id DESC LIMIT 1";
+            String fetchItemSql = "SELECT * FROM recepciones_almacen_items WHERE recepcion_id = ? ORDER BY id DESC FETCH FIRST 1 ROWS ONLY";
             Map<String, Object> created = genericDataService.keysToLowerCase(jdbcTemplate.queryForMap(fetchItemSql, id));
             return ResponseEntity.status(201).body(created);
         } catch (Exception e) {
