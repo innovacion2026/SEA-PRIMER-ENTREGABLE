@@ -6,7 +6,7 @@ Instalar maven: choco install maven
 
 Iniciar proyecto: mvn spring-boot:run
 
-Crear la BD en PostgreSQL: sea_seed_full.sql
+Crear la BD en Oracle y poblarla: sea_oracle_full.sql
 
 Frontend SEA:
 
