@@ -28,11 +28,38 @@ Verificación: Prueba la conexión directa del nuevo usuario en la consola:
 sqlplus SEA_APP/Desarrollo2026#@localhost:1521/XEPDB1
 
 Debe iniciar sesión mostrando Connected to: Oracle Database 21c Express Edition.4.Configurar la conexión en Oracle SQL Developer:Entorno de trabajo.Abre SQL Developer.Crea una Nueva Conexión (+):Nombre de conexión: SEA_LOCALUsuario: SEA_APPContraseña: Desarrollo2026#Rol: defaultHost: localhostPuerto: 1521Tipo: Selecciona Nombre de servicio (Service Name) y escribe: XEPDB1 (No uses SID: xe).Presiona Probar. Al ver Estado: Correcto, haz clic en Guardar y Conectar.Verificación: Abre el árbol de tablas bajo SEA_LOCAL; estará 100% limpio y vacío, sin ninguna tabla del diccionario AQ$_.
-
+--------------------------------------------------------------------------------------------------
 BD Contenedor multiinquilino: localhost:1521
 BD de Conexión: localhost:1521/XEPDB1
 URL  EM Express: https://localhost:5500/em
 Contraseña sys: Crecer2026
+
+--------------------------------------------------------------------------------------------------
+Crear el usuario SEAD:
+
+ALTER SESSION SET CONTAINER = XEPDB1;
+
+  CREATE TABLESPACE TS_SEAD_DATA
+  DATAFILE 'ts_sead_data01.dbf' SIZE 100M
+  AUTOEXTEND ON NEXT 50M MAXSIZE UNLIMITED
+  EXTENT MANAGEMENT LOCAL
+  SEGMENT SPACE MANAGEMENT AUTO;
+  
+  CREATE USER SEAD IDENTIFIED BY "Desarrollo.96"
+  DEFAULT TABLESPACE TS_SEAD_DATA
+  TEMPORARY TABLESPACE TEMP
+  QUOTA UNLIMITED ON TS_SEAD_DATA
+  ACCOUNT UNLOCK;
+  
+GRANT CREATE SESSION TO SEAD;
+GRANT CREATE TABLE TO SEAD;
+GRANT CREATE VIEW TO SEAD;
+GRANT CREATE SEQUENCE TO SEAD;
+GRANT CREATE PROCEDURE TO SEAD;
+GRANT CREATE TRIGGER TO SEAD;
+GRANT CREATE SYNONYM TO SEAD;
+
+--------------------------------------------------------------------------------------------------
 
 Crear las tablas en Oracle: ?
 
