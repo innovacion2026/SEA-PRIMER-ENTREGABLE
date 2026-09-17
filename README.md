@@ -51,6 +51,7 @@ BD Contenedor multiinquilino: localhost:1521
 BD de Conexión: localhost:1521/XEPDB1
 URL  EM Express: https://localhost:5500/em
 Contraseña sys: Crecer2026
+Contraseña SEAD: Desarrollo.96
 
 --------------------------------------------------------------------------------------------------
 Crear el usuario SEAD:
