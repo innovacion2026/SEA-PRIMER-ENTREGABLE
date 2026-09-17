@@ -1,6 +1,6 @@
-BD Oracle
+BD Oracle:
 
-2.Ejecutar la instalación limpia de Oracle 21c XE:Instalador oficial.Descomprime el archivo original OracleXE212_Win64.zip en una ruta simple y sin espacios (por ejemplo C:\Temp\OracleXE).Haz clic derecho sobre setup.exe y selecciona Ejecutar como administrador.Acepta los términos de licencia y deja la ruta por defecto (C:\app\product\21c\...).Paso crítico - Contraseña: Te solicitará una contraseña maestra para las cuentas administrativas (SYS, SYSTEM y PDBADMIN). Ingresa una contraseña estándar que recuerdes bien (por ejemplo: Oracle2026#) y anótala.Revisa la pantalla de resumen. Notarás los puertos clave:Listener: 1521HTTP EM Express: 5500Nombre de la Pluggable Database (PDB): XEPDB1Haz clic en Instalar y espera a que concluya el proceso.Verificación: Al terminar, abre cmd y ejecuta: sqlplus sys/Oracle2026#@localhost:1521/XEPDB1 as sysdba
+Ejecutar la instalación limpia de Oracle 21c XE:Instalador oficial.Descomprime el archivo original OracleXE212_Win64.zip en una ruta simple y sin espacios (por ejemplo C:\Temp\OracleXE).Haz clic derecho sobre setup.exe y selecciona Ejecutar como administrador.Acepta los términos de licencia y deja la ruta por defecto (C:\app\product\21c\...).Paso crítico - Contraseña: Te solicitará una contraseña maestra para las cuentas administrativas (SYS, SYSTEM y PDBADMIN). Ingresa una contraseña estándar que recuerdes bien (por ejemplo: Oracle2026#) y anótala.Revisa la pantalla de resumen. Notarás los puertos clave:Listener: 1521HTTP EM Express: 5500Nombre de la Pluggable Database (PDB): XEPDB1Haz clic en Instalar y espera a que concluya el proceso.Verificación: Al terminar, abre cmd y ejecuta: sqlplus sys/Oracle2026#@localhost:1521/XEPDB1 as sysdba
 
 Debe conectar de inmediato y mostrar el prompt SQL>.3.Crear el Tablespace y Usuario DEV desde SQL*Plus o SQL Developer:Aislamiento inicial.Desde el mismo cmd conectado a XEPDB1 (o desde SQL Developer conectado a XEPDB1 como SYS), ejecuta el bloque de aprovisionamiento para aislar tu desarrollo:
 
@@ -33,7 +33,8 @@ Crear las tablas en Oracle: ?
 
 Poblar las tablas: ?.sql
 
-
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 Backend:
 
 Instalar JDK 17
@@ -42,11 +43,17 @@ Instalar maven: choco install maven
 
 Iniciar proyecto: mvn spring-boot:run
 
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+
 Frontend SEA:
 
 npm install (npm install --legacy-peer-deps)
 
 npm start
+
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 
 Frontend SEA Proveedores:
 
